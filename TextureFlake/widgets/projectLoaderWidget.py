@@ -3,6 +3,14 @@ from PySide2.QtWidgets import  (QWidget, QSizePolicy, QVBoxLayout, QHBoxLayout,
 								QLabel, QLineEdit, QPushButton, QDialog, QComboBox)
 from PySide2.QtCore import Qt, QModelIndex
 
+import Obsolete
+importlib.reload(Obsolete)
+
+import Obsolete.projectMetadata
+importlib.reload(Obsolete.projectMetadata)
+from Obsolete.envHandler import check_project_env
+from Obsolete.projectMetadata import ProjectMeta
+
 from ..core import substanceHelper as SP
 importlib.reload(SP)
 from .dialogs import fileDialogs
@@ -17,6 +25,12 @@ from .dialogs.fileDialogs import SaveSceneDialog
 class AssetLoaderWidget(QWidget):
 	def __init__(self, parent=None):
 		super(AssetLoaderWidget, self).__init__(parent)
+
+		projectfile = check_project_env()
+		self._project = ProjectMeta()
+		self._project.load(ProjectFile=projectfile)
+
+		print(self._project.get_AssetTypes())
 
 		self.setWindowTitle('Asset Loader')
 		self.setMinimumSize(1,1)
@@ -114,3 +128,5 @@ class AssetLoaderWidget(QWidget):
 	def selectedAsset(self, index=QModelIndex):
 		item = self.assetModel.itemFromIndex(index)
 		
+	def loadAssets(self):
+		pass
