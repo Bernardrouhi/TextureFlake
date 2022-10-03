@@ -3,14 +3,8 @@ from PySide2.QtWidgets import  (QWidget, QSizePolicy, QVBoxLayout, QHBoxLayout,
 								QLabel, QLineEdit, QPushButton, QDialog, QComboBox)
 from PySide2.QtCore import Qt, QModelIndex
 
-import Obsolete
-importlib.reload(Obsolete)
-
-import Obsolete.projectMetadata
-importlib.reload(Obsolete.projectMetadata)
-from Obsolete.envHandler import check_project_env
-from Obsolete.projectMetadata import ProjectMeta
-
+from ..core import obsoleteHelper as Ob
+importlib.reload(Ob)
 from ..core import substanceHelper as SP
 importlib.reload(SP)
 from .dialogs import fileDialogs
@@ -26,11 +20,8 @@ class AssetLoaderWidget(QWidget):
 	def __init__(self, parent=None):
 		super(AssetLoaderWidget, self).__init__(parent)
 
-		projectfile = check_project_env()
-		self._project = ProjectMeta()
-		self._project.load(ProjectFile=projectfile)
-
-		print(self._project.get_AssetTypes())
+		self._project = Ob.ProjectQObject()
+		self._project.onWorkDirectoryUpdate.connect(self.changeHappen)
 
 		self.setWindowTitle('Asset Loader')
 		self.setMinimumSize(1,1)
@@ -72,26 +63,6 @@ class AssetLoaderWidget(QWidget):
 
 		self.assetModel = AssetModel()
 		self.assets.setModel(self.assetModel)
-		
-		# Test Data
-		entries = [
-			{"Name":'Asset_01'},
-			{"Name":'Asset_02'},
-			{"Name":'Asset_03',}
-		]
-
-		# AssetType
-		char = AssetItem({"Name":'Character'})
-		env = AssetItem({"Name":'Environment'})
-
-		self.assetModel.appendRow(char)
-		self.assetModel.appendRow(env)
-
-		# Assets
-		for i in entries:
-			item = AssetItem(i)
-			char.appendRow(item)
-
 
 		layout.addWidget(self.assets)
 
@@ -108,6 +79,8 @@ class AssetLoaderWidget(QWidget):
 		layout.addWidget(asset_btn)
 
 		asset_btn.clicked.connect(self.createNewAsset)
+
+		self.loadAssets()
 
 	def createNewAsset(self, button=bool):
 		# check for open project
@@ -129,4 +102,17 @@ class AssetLoaderWidget(QWidget):
 		item = self.assetModel.itemFromIndex(index)
 		
 	def loadAssets(self):
-		pass
+		assets = [
+			{"Name":'Asset_01'},
+			{"Name":'Asset_02'},
+			{"Name":'Asset_03',}
+		]
+		for assetType in self._project.get_AssetTypesName():
+			assteTypeItem = AssetItem({"Name":assetType})
+			for asset in assets:
+				nAsset = AssetItem(asset)
+				assteTypeItem.appendRow(nAsset)
+			self.assetModel.appendRow(assteTypeItem)
+
+	def changeHappen(self):
+		print("ChangeHappen")
