@@ -4,11 +4,10 @@ from PySide2.QtCore import (Signal, QObject)
 import Obsolete
 importlib.reload(Obsolete)
 
-import Obsolete.projectMetadata
-importlib.reload(Obsolete.projectMetadata)
+import Obsolete.projectNode
+importlib.reload(Obsolete.projectNode)
 
-from Obsolete.projectMetadata import ProjectObject
-
+from Obsolete.projectNode import ProjectObject
 
 class ProjectQObject(ProjectObject, QObject):
 	"""Handle Project file"""

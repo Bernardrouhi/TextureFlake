@@ -8,9 +8,9 @@ importlib.reload(projectLoaderWidget)
 from .projectLoaderWidget import AssetLoaderWidget
 
 class TextureFlakeMainWindow(QMainWindow):
+	__version__ = "1.0.0"
 	def __init__(self, parent=None):
 		super(TextureFlakeMainWindow, self).__init__(parent)
-		self.__version__ = "1.0"
 
 		self.setWindowTitle(f'Texture Flake v{self.__version__}')
 
