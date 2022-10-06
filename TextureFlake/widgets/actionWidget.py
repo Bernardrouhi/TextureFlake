@@ -3,10 +3,13 @@ from PySide2.QtWidgets import  (QWidget, QSizePolicy, QVBoxLayout, QHBoxLayout,
 								QFileDialog)
 from PySide2.QtCore import Qt, QModelIndex
 
+from Obsolete import pipelineNode as ObPipe
+
 class ActionWidget(QWidget):
 	def __init__(self, parent=None):
 		super(ActionWidget, self).__init__(parent)
 
+		self._pipeline = ObPipe.Pipeline()
 		self.setWindowTitle('Asset')
 		self.setMinimumSize(1,1)
 
@@ -32,7 +35,7 @@ class ActionWidget(QWidget):
 		layout.addWidget(projectNameTitle_lb)
 		layout.addWidget(self.projectName_lb)
 
-        # ------- Row 2 -------
+		# ------- Row 2 -------
 		# ----------------------------------------
 		layout = QHBoxLayout()
 		layout.setContentsMargins(0,0,0,0)
@@ -47,7 +50,7 @@ class ActionWidget(QWidget):
 		layout.addWidget(assetTypeTitle_lb)
 		layout.addWidget(self.assetType_lb)
 
-        # ------- Row 3 -------
+		# ------- Row 3 -------
 		# ----------------------------------------
 		layout = QHBoxLayout()
 		layout.setContentsMargins(0,0,0,0)
@@ -62,7 +65,7 @@ class ActionWidget(QWidget):
 		layout.addWidget(assetContainerTitle_lb)
 		layout.addWidget(self.assetContainer_lb)
 
-        # ------- Row 3 -------
+		# ------- Row 3 -------
 		# ----------------------------------------
 		layout = QHBoxLayout()
 		layout.setContentsMargins(0,0,0,0)
@@ -76,5 +79,27 @@ class ActionWidget(QWidget):
 
 		layout.addWidget(assetNameTitle_lb)
 		layout.addWidget(self.assetName_lb)
+
+	def reload_ProjectInformation(self):
+		self.set_ProjectName()
+		self.set_AssetType()
+		self.set_AssetContainer()
+		self.set_AssetName()
+
+	def set_ProjectName(self):
+		projectName = self._pipeline.get_ProjectName()
+		if projectName : self.projectName_lb.setText(projectName)
+
+	def set_AssetType(self):
+		assetType = self._pipeline.get_AssetType()
+		if assetType : self.assetType_lb.setText(assetType)
+
+	def set_AssetContainer(self):
+		assetContainer = self._pipeline.get_AssetContainer()
+		if assetContainer : self.assetContainer_lb.setText(assetContainer)
+
+	def set_AssetName(self):
+		assetName = self._pipeline.get_AssetName()
+		if assetName : self.assetName_lb.setText(assetName)
 
 

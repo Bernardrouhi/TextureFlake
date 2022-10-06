@@ -14,7 +14,8 @@ from . import assetWidget
 importlib.reload(assetWidget)
 from . import actionWidget
 importlib.reload(actionWidget)
-from Obsolete import envHandler as ObEnv
+
+from ..core.obsoleteHelper import ProjectQObject
 
 from .assetWidget import AssetTreeView, AssetItem, AssetModel
 from .actionWidget import ActionWidget
@@ -22,11 +23,11 @@ from .actionWidget import ActionWidget
 from .dialogs.fileDialogs import SaveSceneDialog
 
 class AssetLoaderWidget(QWidget):
-	def __init__(self, parent=None):
+	def __init__(self, project=ProjectQObject(), parent=None):
 		super(AssetLoaderWidget, self).__init__(parent)
 
-		self._project = Ob.ProjectQObject(ProjectFile=ObEnv.check_project_env())
-		self._project.onWorkDirectoryUpdate.connect(self.changeHappen)
+		self._project = project
+		self._project.onWorkDirectoryUpdate.connect(self.reloadLocalWorkDirectory)
 
 		self.setWindowTitle('Asset Loader')
 		self.setMinimumSize(1,1)
@@ -47,12 +48,11 @@ class AssetLoaderWidget(QWidget):
 
 		main_layout.addLayout(layout)
 
-		work_btn = QPushButton("Pick Workdirectory")
-		layout.addWidget(work_btn)
+		workTitle_lb = QLabel(u"Path:")
+		self.workDirectory_lb = QLabel(u"")
 
-		work_btn.clicked.connect(self.pick_Workdirectory)
-
-		layout.addWidget(work_btn)
+		layout.addWidget(workTitle_lb)
+		layout.addWidget(self.workDirectory_lb)
 
 		# ------- Row 2 -------
 		# ----------------------------------------
@@ -96,8 +96,8 @@ class AssetLoaderWidget(QWidget):
 
 		main_layout.addLayout(layout)
 
-		action = ActionWidget()
-		layout.addWidget(action)
+		self.assetAction = ActionWidget()
+		layout.addWidget(self.assetAction)
 
 		# ------- Row 5 -------
 		# ----------------------------------------
@@ -129,11 +129,6 @@ class AssetLoaderWidget(QWidget):
 
 		self.loadAssets()
 
-	def pick_Workdirectory(self):
-		work_Dir = QFileDialog.getExistingDirectory(self,"Pick Work Directory Folder", os.path.expanduser("~"))
-		if work_Dir:
-			self._project.set_WorkDirectory(work_directory=work_Dir)
-
 	def createNewAsset(self, button=bool):
 		# check for open project
 		if SP.is_SceneOpen():
@@ -155,8 +150,11 @@ class AssetLoaderWidget(QWidget):
 
 	def selectedAsset(self, index=QModelIndex):
 		item = self.assetModel.itemFromIndex(index)
+		if item.parent() and not item.hasChildren():
+			pass
 		
 	def loadAssets(self):
+		self.assetModel.clear()
 		assets = [
 			{"Name":'Asset_01'},
 			{"Name":'Asset_02'},
@@ -164,10 +162,19 @@ class AssetLoaderWidget(QWidget):
 		]
 		for assetType in self._project.get_AssetTypesName():
 			assteTypeItem = AssetItem({"Name":assetType})
-			# for asset in assets:
-			# 	nAsset = AssetItem(asset)
-			# 	assteTypeItem.appendRow(nAsset)
+			for asset in assets:
+				nAsset = AssetItem(asset)
+				assteTypeItem.appendRow(nAsset)
 			self.assetModel.appendRow(assteTypeItem)
 
-	def changeHappen(self):
-		print("ChangeHappen")
+	def reloadLocalWorkDirectory(self):
+		""" Update the widgets on local directory change.
+		"""
+		workDir = self._project.get_WorkDirectory()
+		if os.path.exists(workDir):
+			# Update Work Directory
+			self.workDirectory_lb.setText(workDir)
+			# Asset List
+			self.assetAction.reload_ProjectInformation()
+			# Asset Information
+			self.loadAssets()

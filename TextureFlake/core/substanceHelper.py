@@ -4,7 +4,7 @@ import substance_painter.ui
 import os
 from PySide2.QtWidgets import QMainWindow
 
-def create_Scene():
+def create_Scene(savePath=str(), fbxFile=str(), template=str()):
 	"""Create a new Substance Painter Project
 
 	TODO replace HardCoded path to project based
