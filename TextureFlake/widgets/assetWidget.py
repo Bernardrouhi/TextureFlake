@@ -29,9 +29,9 @@ class AssetTreeView(QTreeView):
 		pass
 
 class AssetItem(QStandardItem):
-	def __init__(self, model=dict):
+	def __init__(self, model=dict, **kwargs):
 		self._localData = model
-		super(AssetItem, self).__init__(model["Name"])
+		QStandardItem.__init__(self, model["Name"])
 
 	def getAssetVersions(self):
 		return 

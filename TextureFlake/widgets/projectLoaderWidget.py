@@ -130,20 +130,25 @@ class AssetLoaderWidget(QWidget):
 		self.loadAssets()
 
 	def createNewAsset(self, button=bool):
-		# check for open project
-		if SP.is_SceneOpen():
-			# check for changes in the current scene
-			if SP.is_NeedSaving():
-				dialog = SaveSceneDialog(title="Warning", message="The project hasn't been saved yet. Save the Scene?")
-				if dialog.exec_() == QDialog.Accepted:
-					SP.save_Scene()
-					SP.close_Scene()
-					SP.create_Scene()
-			else:
-				SP.close_Scene()
-				SP.create_Scene()
-		else:
-			SP.create_Scene()
+		index = self.assets.currentIndex()
+		item = self.assetModel.item(index.row(), index.column())
+		# if item.parent() and not item.hasChildren():
+		# 	print(item)
+		
+		# # check for open project
+		# if SP.is_SceneOpen():
+		# 	# check for changes in the current scene
+		# 	if SP.is_NeedSaving():
+		# 		dialog = SaveSceneDialog(title="Warning", message="The project hasn't been saved yet. Save the Scene?")
+		# 		if dialog.exec_() == QDialog.Accepted:
+		# 			SP.save_Scene()
+		# 			SP.close_Scene()
+		# 			SP.create_Scene()
+		# 	else:
+		# 		SP.close_Scene()
+		# 		SP.create_Scene()
+		# else:
+		# 	SP.create_Scene()
 
 	def exportTexture(self):
 		print("Show Export Window")
